@@ -50,7 +50,7 @@ const deleteUsers = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
     const deletedUser = await User.findByIdAndDelete(id);
     res.json({
@@ -61,6 +61,27 @@ const deleteUsers = asyncHandler(async (req, res) => {
   }
 });
 
+// update the user
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        mobail: req.body.mobail
+      },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
-
-module.exports = { createUser, loginCtrl, gealltUsers,deleteUsers };
+module.exports = { createUser, loginCtrl, gealltUsers, deleteUsers, updateUser };
