@@ -32,18 +32,35 @@ const loginCtrl = asyncHandler(async (req, res) => {
   }
 });
 
-
 // get all the user
 const gealltUsers = asyncHandler(async (req, res) => {
-try{
- const getuser=await User.find();
- res.json({
-  getuser
- })
-}catch(err){
-  throw new Error(err); 
-}
-})
+  try {
+    const getuser = await User.find();
+    res.json({
+      getuser,
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+});
+
+// delet the user
+const deleteUsers = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const deletedUser = await User.findByIdAndDelete(id);
+    res.json({
+      deletedUser,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
-module.exports = { createUser, loginCtrl,gealltUsers };
+
+module.exports = { createUser, loginCtrl, gealltUsers,deleteUsers };
