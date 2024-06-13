@@ -71,12 +71,12 @@ const updateUser = asyncHandler(async (req, res) => {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         email: req.body.email,
-        mobail: req.body.mobail
+        mobail: req.body.mobail,
       },
       { new: true }
     );
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
     res.json(updatedUser);
   } catch (err) {
@@ -84,4 +84,22 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createUser, loginCtrl, gealltUsers, deleteUsers, updateUser };
+// get the single user
+const singlUService = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const getsu = await User.findById(id);
+    res.json(getsu);
+  } catch (err) {
+    throw new Error(err);
+  }
+});
+
+module.exports = {
+  createUser,
+  loginCtrl,
+  gealltUsers,
+  deleteUsers,
+  updateUser,
+  singlUService
+};
