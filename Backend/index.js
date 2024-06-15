@@ -1,9 +1,8 @@
 const express = require("express");
 const app = express();
 require('dotenv').config();
-
 const net = require('net');
-const dbconnect = require("./config/DBconnect");
+const dbconnect = require("./config/dbconnect");
 const authRoute = require("./routes/authroute");
 const bodyParser = require("body-parser");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
@@ -17,11 +16,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/api/user", authRoute);
 
-// error handler
+// Error handler
 app.use(notFound);
 app.use(errorHandler);
 
-// listing on the port
 function checkPort(port) {
   return new Promise((resolve, reject) => {
     const tester = net.createServer()

@@ -4,7 +4,7 @@ const Dbconnect = async () => {
   try {
     await mongoose.connect(
       "mongodb+srv://kuldeepchudasama6999:icBAhWXZN9XafXJb@e-com.w630bfc.mongodb.net/digitic",
-      { useNewUrlParser: false, useUnifiedTopology: false }
+      { useNewUrlParser: true, useUnifiedTopology: true }
     );
     console.log("Database connection successful");
   } catch (error) {
