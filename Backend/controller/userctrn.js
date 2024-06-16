@@ -63,7 +63,8 @@ const deleteUsers = asyncHandler(async (req, res) => {
 
 // update the user
 const updateUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  console.log(req.user);
+  const { _id } = req.user;
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -84,6 +85,50 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+// block the user
+const blockuser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const block = await User.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: true,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json({
+      message: "User blocked",
+      user: block,
+    });
+  } catch (error) {
+    throw new Error(error.message);
+  }
+});
+
+
+// unblock the user
+const unblockuser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const block = await User.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: false,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json({
+      message: "User unblocked",
+      user: block,
+    });
+  } catch (error) {
+    throw new Error(error.message);
+  }
+});
 // get the single user
 const singlUService = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -101,5 +146,7 @@ module.exports = {
   gealltUsers,
   deleteUsers,
   updateUser,
-  singlUService
+  singlUService,
+  blockuser,
+  unblockuser,
 };

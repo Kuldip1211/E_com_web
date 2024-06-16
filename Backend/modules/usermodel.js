@@ -28,6 +28,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  caart: {
+    type: Array,
+    default: [],
+  },
+  address: [{type: mongoose.Schema.Types.ObjectId,ref: "Address"}],
+  Wishlist: [{type: mongoose.Schema.Types.ObjectId,ref: "Product"}],
+},{
+  timestamps : true,
 });
 
 userSchema.pre("save", async function (next) {
