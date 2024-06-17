@@ -9,12 +9,14 @@ const {
   singlUService,
   blockuser,
   unblockuser,
+  handleRefrashToken
 } = require("../controller/userctrn");
 const { AuthMiddleware , IsAdmin } = require("../middleware/authmiddleware");
 
 router.post("/register", createUser);
 router.post("/login", loginCtrl);
 router.get("/all-user", gealltUsers);
+router.get("/refresh",handleRefrashToken );
 router.delete("/:id", deleteUsers);
 router.get("/:id", AuthMiddleware, IsAdmin , singlUService);
 router.put("/update-user",AuthMiddleware, updateUser);

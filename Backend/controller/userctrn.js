@@ -1,8 +1,10 @@
 const { generateToken } = require("../config/Jwtoken");
 const User = require("../modules/usermodel");
 const asyncHandler = require("express-async-handler");
-const validateMongodbid = require("../utils/validMongobdid")
-const ganrateRefrashToken = require("../config/Refreshtoken")
+const validateMongodbid = require("../utils/validMongobdid");
+const ganrateRefrashToken = require("../config/Refreshtoken");
+const jwt = require('jsonwebtoken');
+
 
 // Create a new user
 const createUser = asyncHandler(async (req, res) => {
@@ -23,15 +25,19 @@ const loginCtrl = asyncHandler(async (req, res) => {
   const findUser = await User.findOne({ email });
   if (findUser && (await findUser.isPasswordMatched(password))) {
     const refreshToken = await ganrateRefrashToken(findUser?.id);
-    const updateUSer = await User.findByIdAndUpdate(findUser.id,{
-      refreshToken : refreshToken
-    },{
-      new : true ,
-    })
-    res.cookie('refreshToken',refreshToken,{
-        httpOnly : true,
-        maxAge: 24*60*60*1000,
-    })
+    const updateUSer = await User.findByIdAndUpdate(
+      findUser.id,
+      {
+        refreshToken: refreshToken,
+      },
+      {
+        new: true,
+      }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
     res.json({
       _id: findUser._id,
       firstname: findUser.firstname,
@@ -42,6 +48,25 @@ const loginCtrl = asyncHandler(async (req, res) => {
   } else {
     res.status(401).json({ message: "Invalid email or password" });
   }
+});
+
+// handle refrshtoken
+const handleRefrashToken = asyncHandler(async (req, res) => {
+  const cookie = req.cookies;
+  if(!cookie?.refreshToken)throw new Error("no refresh token in the cookie")
+    const refreshToken = cookie.refreshToken;
+  console.log(refreshToken);
+  const user = await User.findOne( {refreshToken});
+  if(!user) throw new Error ("no refresh token in the db or not matched");
+  jwt.verify(refreshToken,process.env.JWT_SECRET,(err,decoded)=>{
+    if(err || user.id !== decoded.id){
+      throw new Error("something wrong with decoded id");
+    }
+    const acrossToken = generateToken(user?._id)
+    res.json({
+      acrossToken
+    })
+  })
 });
 
 // get all the user
@@ -101,7 +126,7 @@ const updateUser = asyncHandler(async (req, res) => {
 // block the user
 const blockuser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   try {
     const block = await User.findByIdAndUpdate(
       id,
@@ -164,4 +189,5 @@ module.exports = {
   singlUService,
   blockuser,
   unblockuser,
+  handleRefrashToken,
 };
