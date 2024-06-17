@@ -1,6 +1,8 @@
 const { generateToken } = require("../config/Jwtoken");
 const User = require("../modules/usermodel");
 const asyncHandler = require("express-async-handler");
+const validateMongodbid = require("../utils/validMongobdid")
+const ganrateRefrashToken = require("../config/Refreshtoken")
 
 // Create a new user
 const createUser = asyncHandler(async (req, res) => {
@@ -20,6 +22,16 @@ const loginCtrl = asyncHandler(async (req, res) => {
   console.log(email, password);
   const findUser = await User.findOne({ email });
   if (findUser && (await findUser.isPasswordMatched(password))) {
+    const refreshToken = await ganrateRefrashToken(findUser?.id);
+    const updateUSer = await User.findByIdAndUpdate(findUser.id,{
+      refreshToken : refreshToken
+    },{
+      new : true ,
+    })
+    res.cookie('refreshToken',refreshToken,{
+        httpOnly : true,
+        maxAge: 24*60*60*1000,
+    })
     res.json({
       _id: findUser._id,
       firstname: findUser.firstname,
@@ -65,6 +77,7 @@ const deleteUsers = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   console.log(req.user);
   const { _id } = req.user;
+  validateMongodbid();
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -88,6 +101,7 @@ const updateUser = asyncHandler(async (req, res) => {
 // block the user
 const blockuser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  
   try {
     const block = await User.findByIdAndUpdate(
       id,
@@ -107,11 +121,11 @@ const blockuser = asyncHandler(async (req, res) => {
   }
 });
 
-
 // unblock the user
 const unblockuser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
+    validateMongodbid();
     const block = await User.findByIdAndUpdate(
       id,
       {
@@ -132,6 +146,7 @@ const unblockuser = asyncHandler(async (req, res) => {
 // get the single user
 const singlUService = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongodbid();
   try {
     const getsu = await User.findById(id);
     res.json(getsu);

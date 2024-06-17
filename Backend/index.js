@@ -5,14 +5,14 @@ const net = require('net');
 const dbconnect = require("./config/dbconnect");
 const authRoute = require("./routes/authroute");
 const bodyParser = require("body-parser");
-const { notFound, errorHandler } = require("./middleware/errorHandler");
-
+const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 4000;
-
+const { notFound, errorHandler} = require("./middleware/errorHandler");
 dbconnect();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use("/api/user", authRoute);
 
